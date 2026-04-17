@@ -7,6 +7,10 @@
 
 import SwiftUI
 
+private enum HybridNavigationConstants {
+    static let frameworkName = "swiftui"
+}
+
 private struct HybridNavigationDestination<D: Hashable, Destination: View>: ViewModifier {
     @EnvironmentObject private var routeStack: RouteStack
 
@@ -14,17 +18,24 @@ private struct HybridNavigationDestination<D: Hashable, Destination: View>: View
     let destination: (D) -> Destination
 
     func body(content: Content) -> some View {
-        content
-            .task {
-                routeStack.registerDestination(for: dataType) { value in
-                    let hostingController = UIHostingController(
-                        rootView: destination(value).environmentObject(routeStack)
-                    )
-                    hostingController.routeStack = routeStack
-                    hostingController.swiftUIScreenType = ObjectIdentifier(Destination.self)
-                    return hostingController
+        if let navigationController = routeStack.navigationController,
+           case let className = String(reflecting: type(of: navigationController)),
+           className.lowercased().contains(HybridNavigationConstants.frameworkName) {
+            content
+                .navigationDestination(for: dataType, destination: destination)
+        } else {
+            content
+                .task {
+                    routeStack.registerDestination(for: dataType) { value in
+                        let hostingController = UIHostingController(
+                            rootView: destination(value).environmentObject(routeStack)
+                        )
+                        hostingController.routeStack = routeStack
+                        hostingController.swiftUIScreenType = ObjectIdentifier(Destination.self)
+                        return hostingController
+                    }
                 }
-            }
+        }
     }
 }
 

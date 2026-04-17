@@ -16,7 +16,7 @@ import ObjectiveC
 public final class RouteStack: ObservableObject {
     public private(set) weak var navigationController: UINavigationController?
     @Published public private(set) var path = NavigationPath()
-
+    
     public var pathBinding: Binding<NavigationPath> {
         .init(
             get: { [weak self] in self?.path ?? NavigationPath() },
@@ -25,6 +25,7 @@ public final class RouteStack: ObservableObject {
     }
 
     public init() {
+        print("RouteStack init")
     }
 
     public init(navigationController: UINavigationController? = nil) {
@@ -32,6 +33,7 @@ public final class RouteStack: ObservableObject {
     }
 
     deinit {
+        print("deallocated RouteStack")
     }
 
     public func attach(to navigationController: UINavigationController) {
