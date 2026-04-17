@@ -14,7 +14,7 @@ import ObjectiveC
 
 @MainActor
 public final class RouteStack: ObservableObject {
-    public private(set) weak var navigationController: UINavigationController?
+    private(set) weak var navigationController: UINavigationController?
     @Published public private(set) var path = NavigationPath()
     
     public var pathBinding: Binding<NavigationPath> {
